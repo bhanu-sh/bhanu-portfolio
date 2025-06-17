@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { name: "Projects", href: "/admin/projects" },
   { name: "Skills", href: "/admin/skills" },
+  { name: "Messages", href: "/admin/messages" }
 ];
 
 export function Sidebar() {

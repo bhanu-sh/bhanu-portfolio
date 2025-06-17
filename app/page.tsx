@@ -6,8 +6,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-// import Link from "next/link"; // No longer needed for smooth scroll
+import { useEffect, useState } from "react";
+import { Project, Skill } from "@/types";
+import Image from "next/image";
+import { ExternalLink } from "lucide-react";
+import toast from "react-hot-toast";
 
 const AnimatedBackground = () => {
   return (
@@ -32,6 +35,45 @@ const AnimatedBackground = () => {
 };
 
 export default function Home() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [skillLoading, setSkillLoading] = useState(true);
+  const [projectLoading, setProjectLoading] = useState(true);
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [formLoading, setFormLoading] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setFormLoading(true);
+      await fetch("/api/messages", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
+      toast.success("Message sent successfully!");
+      setForm({ name: "", email: "", message: "" });
+      // Optionally scroll to top or clear form
+      const mainSection = document.getElementById("main");
+      if (mainSection) {
+        mainSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message. Please try again later.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const scrollToContact = () => {
     const contactSection = document.getElementById("contact");
     if (contactSection) {
@@ -42,9 +84,22 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    fetch("/api/skills")
+      .then((res) => res.json())
+      .then(setSkills)
+      .finally(() => setSkillLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/projects")
+      .then((res) => res.json())
+      .then(setProjects)
+      .finally(() => setProjectLoading(false));
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Inline CSS for liquid glass button animation */}
       <style jsx>{`
         .liquid-glass-button {
           background: rgba(
@@ -99,7 +154,10 @@ export default function Home() {
       `}</style>
 
       {/* Hero Section */}
-      <section className="relative h-screen flex flex-col items-center justify-center px-6">
+      <section
+        id="main"
+        className="relative h-screen flex flex-col items-center justify-center px-6"
+      >
         <AnimatedBackground />
         <div className="relative z-10 text-center space-y-6">
           <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-300 to-blue-400">
@@ -109,7 +167,7 @@ export default function Home() {
             Software Developer | Web & Mobile Apps
           </p>
           <button
-            onClick={scrollToContact} // Added onClick handler here
+            onClick={scrollToContact}
             className="liquid-glass-button cursor-pointer text-white font-semibold rounded-full px-6 py-3 transition-transform duration-300 ease-in-out"
           >
             Get in Touch
@@ -140,39 +198,44 @@ export default function Home() {
           Projects
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {[
-            {
-              name: "E-Commerce Platform",
-              desc: "A scalable online store built with Next.js and Stripe.",
-              link: "#",
-            },
-            {
-              name: "Task Management App",
-              desc: "A mobile-first app using React Native and Firebase.",
-              link: "#",
-            },
-            {
-              name: "3D Portfolio",
-              desc: "This portfolio with Three.js for interactive visuals.",
-              link: "#",
-            },
-          ].map((project) => (
+          {projectLoading ? (
+            <p className="text-gray-400 text-center">Loading projects...</p>
+          ) : projects.length === 0 ? (
+            <p className="text-gray-400 text-center">No projects found</p>
+          ) : null}
+          {projects.map((project) => (
             <Card
-              key={project.name}
+              key={project._id}
               className="bg-black/50 border-none glass-effect"
             >
               <CardHeader>
-                <CardTitle className="text-white">{project.name}</CardTitle>
+                <CardTitle className="text-white text-lg">
+                  {project.name}
+                </CardTitle>
               </CardHeader>
               <CardContent>
+                {project.image && (
+                  <Image
+                    width={500}
+                    height={300}
+                    src={project.image}
+                    alt={project.name}
+                    className="w-full h-48 object-cover mb-4 rounded-lg"
+                  />
+                )}
                 <p className="text-gray-100">{project.desc}</p>
                 <Button
                   asChild
                   variant="link"
                   className="mt-4 text-blue-300 hover:text-blue-100"
                 >
-                  {/* Keep the Link here for actual project links */}
-                  <Link href={project.link}>View Project</Link>
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Project <ExternalLink className="inline-block" />
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -186,23 +249,18 @@ export default function Home() {
           Skills
         </h2>
         <div className="flex flex-wrap gap-2 justify-center">
-          {[
-            "Next.js",
-            "React",
-            "Three.js",
-            "Tailwind CSS",
-            "TypeScript",
-            "Node.js",
-            "React Native",
-            "Firebase",
-            "MongoDB",
-          ].map((skill) => (
+          {skillLoading ? (
+            <p className="text-gray-400">Loading skills...</p>
+          ) : skills.length === 0 ? (
+            <p className="text-gray-400">No skills found</p>
+          ) : null}
+          {skills.map((skill) => (
             <Badge
-              key={skill}
+              key={skill._id}
               variant="secondary"
               className="text-lg py-2 px-4 bg-black/50 glass-effect text-gray-100"
             >
-              {skill}
+              {skill.name}
             </Badge>
           ))}
         </div>
@@ -215,22 +273,35 @@ export default function Home() {
             <CardTitle className="text-3xl text-white">Contact Me</CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <Input
+                name="name"
                 placeholder="Your Name"
                 className="bg-black/50 text-white placeholder-gray-400 border-none glass-effect"
+                value={form.name}
+                onChange={handleChange}
               />
               <Input
+                name="email"
                 placeholder="Your Email"
                 type="email"
                 className="bg-black/50 text-white placeholder-gray-400 border-none glass-effect"
+                value={form.email}
+                onChange={handleChange}
               />
               <Textarea
+                name="message"
                 placeholder="Your Message"
                 className="bg-black/50 text-white placeholder-gray-400 border-none glass-effect"
+                value={form.message}
+                onChange={handleChange}
               />
-              <Button type="submit" className="text-white">
-                Send Message
+              <Button
+                disabled={formLoading}
+                type="submit"
+                className="text-white"
+              >
+                {formLoading ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </CardContent>

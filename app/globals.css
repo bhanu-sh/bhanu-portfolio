@@ -119,6 +119,14 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+.swal-custom-popup {
+  backdrop-filter: blur(12px);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(30, 30, 30, 0.6);
+}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
