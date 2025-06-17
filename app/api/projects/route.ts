@@ -14,3 +14,23 @@ export async function POST(req: Request) {
   const project = await Project.create(body);
   return NextResponse.json(project);
 }
+
+export async function DELETE(req: Request) {
+  await connectDB();
+  const { id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Project ID is required" },
+      { status: 400 }
+    );
+  }
+
+  const deletedProject = await Project.findByIdAndDelete(id);
+
+  if (!deletedProject) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ message: "Project deleted successfully" });
+}

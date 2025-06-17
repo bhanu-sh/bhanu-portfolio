@@ -55,13 +55,18 @@ export default function SkillsPage() {
     setSkills((prev) => prev.filter((skill) => skill._id !== id));
 
     try {
-      const res = await fetch(`/api/skills/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
+      const res = await fetch("/api/skills", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete skill");
+      }
     } catch (err) {
-      // Rollback UI on error
       setSkills(previousSkills);
-      toast.error("Failed to delete skill");
-      console.error("Error deleting skill:", err);
+      console.error("Failed to delete skill:", err);
     }
   }
 

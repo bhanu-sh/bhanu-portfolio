@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Project } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 
 export default function ProjectForm() {
@@ -68,10 +68,19 @@ export default function ProjectForm() {
     const oldProjects = [...projects];
     setProjects((prev) => prev.filter((p) => p._id !== id));
 
-    const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/projects", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete project");
+      }
+    } catch (err) {
       setProjects(oldProjects);
-      console.error("Failed to delete project");
+      console.error("Failed to delete project:", err);
     }
   }
 
@@ -132,7 +141,9 @@ export default function ProjectForm() {
             <CardContent className="flex flex-col justify-between h-full">
               <div>
                 <p
-                  ref={(el) => (descRefs.current[p._id] = el)}
+                  ref={(el) => {
+                    descRefs.current[p._id] = el;
+                  }}
                   className={expanded[p._id] ? "-mb-1" : "-mb-1 line-clamp-2"}
                 >
                   {p.desc}

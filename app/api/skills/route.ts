@@ -14,3 +14,23 @@ export async function POST(req: Request) {
   const skill = await Skill.create(body);
   return NextResponse.json(skill);
 }
+
+export async function DELETE(req: Request) {
+  await connectDB();
+  const { id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Skill ID is required" },
+      { status: 400 }
+    );
+  }
+
+  const deletedSkill = await Skill.findByIdAndDelete(id);
+
+  if (!deletedSkill) {
+    return NextResponse.json({ error: "Skill not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ message: "Skill deleted successfully" });
+}
