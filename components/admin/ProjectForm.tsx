@@ -1,10 +1,16 @@
-"use client";
-
 import { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Project } from "@/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
 import Image from "next/image";
 
 export default function ProjectForm() {
@@ -15,6 +21,7 @@ export default function ProjectForm() {
     image: "",
     link: "",
   });
+  const [editing, setEditing] = useState<Project | null>(null);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [isClamped, setIsClamped] = useState<{ [key: string]: boolean }>({});
   const [loading, setLoading] = useState(false);
@@ -28,7 +35,6 @@ export default function ProjectForm() {
   }, []);
 
   useEffect(() => {
-    // Check which descriptions are clamped
     const newIsClamped: { [key: string]: boolean } = {};
     projects.forEach((p) => {
       const el = descRefs.current[p._id];
@@ -39,9 +45,7 @@ export default function ProjectForm() {
     setIsClamped(newIsClamped);
   }, [projects]);
 
-  console.log("Projects loaded:", projects);
-
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleAddSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.desc || !form.link) return;
 
@@ -75,12 +79,40 @@ export default function ProjectForm() {
         body: JSON.stringify({ id }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete project");
-      }
+      if (!res.ok) throw new Error("Failed to delete project");
     } catch (err) {
       setProjects(oldProjects);
       console.error("Failed to delete project:", err);
+    }
+  }
+
+  async function handleEditSave() {
+    if (!editing) return;
+
+    try {
+      const res = await fetch("/api/projects", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editing._id, // Explicitly send `id`
+          name: editing.name,
+          desc: editing.desc,
+          image: editing.image,
+          link: editing.link,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to update project: ${await res.text()}`);
+      }
+
+      const updated = await res.json();
+      setProjects((prev) =>
+        prev.map((p) => (p._id === updated._id ? updated : p))
+      );
+      setEditing(null);
+    } catch (err) {
+      console.error("Failed to update project:", err);
     }
   }
 
@@ -93,40 +125,47 @@ export default function ProjectForm() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Project</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            <Input
-              placeholder="Description"
-              value={form.desc}
-              onChange={(e) => setForm({ ...form, desc: e.target.value })}
-            />
-            <Input
-              placeholder="Image URL (optional)"
-              value={form.image ?? ""}
-              onChange={(e) => setForm({ ...form, image: e.target.value })}
-            />
-            <Input
-              placeholder="Link"
-              value={form.link}
-              onChange={(e) => setForm({ ...form, link: e.target.value })}
-            />
-            <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Project"}
+      {/* Add Button */}
+      <div className="flex justify-between mb-4">
+        <h2 className="text-2xl font-semibold mb-4">All Projects</h2>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button size="icon" variant="secondary">
+              <Plus className="w-5 h-5" />
             </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <h2 className="text-2xl font-semibold mt-10 mb-4">All Projects</h2>
+          </DialogTrigger>
+          <DialogContent className="bg-white text-black sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add New Project</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddSubmit} className="grid gap-4 py-4">
+              <Input
+                placeholder="Name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+              <Input
+                placeholder="Description"
+                value={form.desc}
+                onChange={(e) => setForm({ ...form, desc: e.target.value })}
+              />
+              <Input
+                placeholder="Image URL"
+                value={form.image || ""}
+                onChange={(e) => setForm({ ...form, image: e.target.value })}
+              />
+              <Input
+                placeholder="Link"
+                value={form.link}
+                onChange={(e) => setForm({ ...form, link: e.target.value })}
+              />
+              <Button type="submit" disabled={loading}>
+                {loading ? "Adding..." : "Add Project"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
       {projects.length === 0 && !loading ? (
         <p className="text-gray-400">No projects found</p>
       ) : loading ? (
@@ -186,13 +225,57 @@ export default function ProjectForm() {
                 >
                   {p.link}
                 </a>
-                <Button
-                  variant="destructive"
-                  className="cursor-pointer"
-                  onClick={() => handleDelete(p._id)}
-                >
-                  Delete
-                </Button>
+                <div className="flex gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" onClick={() => setEditing(p)}>
+                        Edit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-white text-black sm:max-w-[500px]">
+                      <DialogHeader>
+                        <DialogTitle>Edit Project</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <Input
+                          placeholder="Name"
+                          value={editing?.name || ""}
+                          onChange={(e) =>
+                            setEditing({ ...editing!, name: e.target.value })
+                          }
+                        />
+                        <Input
+                          placeholder="Description"
+                          value={editing?.desc || ""}
+                          onChange={(e) =>
+                            setEditing({ ...editing!, desc: e.target.value })
+                          }
+                        />
+                        <Input
+                          placeholder="Image URL"
+                          value={editing?.image || ""}
+                          onChange={(e) =>
+                            setEditing({ ...editing!, image: e.target.value })
+                          }
+                        />
+                        <Input
+                          placeholder="Link"
+                          value={editing?.link || ""}
+                          onChange={(e) =>
+                            setEditing({ ...editing!, link: e.target.value })
+                          }
+                        />
+                      </div>
+                      <Button onClick={handleEditSave}>Save Changes</Button>
+                    </DialogContent>
+                  </Dialog>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(p._id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

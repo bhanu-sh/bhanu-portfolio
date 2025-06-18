@@ -34,3 +34,26 @@ export async function DELETE(req: Request) {
 
   return NextResponse.json({ message: "Project deleted successfully" });
 }
+
+export async function PUT(req: Request) {
+  await connectDB();
+  const { id, ...updateData } = await req.json();
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "Project ID is required" },
+      { status: 400 }
+    );
+  }
+
+  const updatedProject = await Project.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedProject) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(updatedProject);
+}
