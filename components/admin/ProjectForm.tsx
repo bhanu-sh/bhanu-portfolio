@@ -119,6 +119,7 @@ export default function ProjectForm() {
   const toggleExpanded = (id: string) => {
     setExpanded((prev) => ({
       ...prev,
+      //test
       [id]: !prev[id],
     }));
   };
