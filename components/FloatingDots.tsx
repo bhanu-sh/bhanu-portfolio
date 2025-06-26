@@ -25,7 +25,7 @@ const FloatingDots = () => {
   const [dots, setDots] = useState<Dot[]>([]);
 
   useEffect(() => {
-    setDots(generateDots(100));
+    setDots(generateDots(200));
   }, []);
 
   return (
@@ -40,10 +40,8 @@ const FloatingDots = () => {
             top: `${dot.y}%`,
             left: `${dot.x}%`,
           }}
-          animate={{
-            y: ["0%", "-100%"],
-            opacity: [0.1, 0.2, 0.1],
-          }}
+          initial={{ opacity: 0, y: 0 }}
+          animate={{ opacity: [0, 0.15, 0], y: -200 }}
           transition={{
             duration: dot.duration,
             delay: dot.delay,

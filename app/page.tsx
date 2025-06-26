@@ -13,28 +13,7 @@ import { ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
 import TypingText from "@/components/TypingText";
 import FloatingDots from "@/components/FloatingDots";
-
-const AnimatedBackground = () => {
-  return (
-    <motion.div
-      className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-gray-950 opacity-60 blur-md"
-      animate={{
-        background: [
-          "linear-gradient(135deg, #0a0f1c, #121826, #1a1f2f)", // deep navy, gunmetal
-          "linear-gradient(135deg, #121826, #1a1f2f, #0a0f1c)",
-          "linear-gradient(135deg, #1a1f2f, #0a0f1c, #121826)",
-          "linear-gradient(135deg, #0a0f1c, #121826, #1a1f2f)",
-        ],
-      }}
-      transition={{
-        duration: 10,
-        ease: "easeInOut",
-        repeat: Infinity,
-        repeatType: "loop",
-      }}
-    />
-  );
-};
+import Tilt from "react-parallax-tilt";
 
 export default function Home() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -60,7 +39,6 @@ export default function Home() {
       });
       toast.success("Message sent successfully!");
       setForm({ name: "", email: "", message: "" });
-      // Optionally scroll to top or clear form
       const mainSection = document.getElementById("main");
       if (mainSection) {
         mainSection.scrollIntoView({
@@ -102,52 +80,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative bg-black text-white">
-      <AnimatedBackground />
       <FloatingDots />
-
-      <style jsx>{`
-        .liquid-glass-button {
-          background: rgba(255, 255, 255, 0);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          backdrop-filter: blur(10px) saturate(180%);
-          -webkit-backdrop-filter: blur(10px) saturate(180%);
-          border-radius: 9999px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease-in-out;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .liquid-glass-button::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          mix-blend-mode: screen;
-          opacity: 0.8;
-        }
-
-        .liquid-glass-button:hover {
-          transform: translateY(-2px) scale(1.02); /* Slight lift and scale on hover */
-          box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.6),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        .liquid-glass-button:active {
-          transform: translateY(0) scale(0.98); /* Press down effect */
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-        }
-      `}</style>
-
-      {/* Hero Section */}
       <section
         id="main"
         className="relative h-screen flex flex-col items-center justify-center px-6"
@@ -160,7 +93,7 @@ export default function Home() {
             exit={{ opacity: 0, y: -50 }}
             className="text-6xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-300 to-blue-400"
           >
-            <TypingText />
+            Bhanu Pratap Sharma
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -169,7 +102,7 @@ export default function Home() {
             exit={{ opacity: 0, y: -50 }}
             className="text-2xl md:text-3xl text-white opacity-90"
           >
-            Software Developer | Web & Mobile Apps
+            <TypingText /> Developer
           </motion.p>
           <button
             onClick={scrollToContact}
@@ -208,24 +141,19 @@ export default function Home() {
       {/* Projects Section */}
       <AnimatePresence mode="sync" initial={false}>
         <section id="projects" className="py-20 px-10 bg-black/20">
-          <motion.h2
-            // initial={{ opacity: 0, y: 20 }}
-            // whileInView={{ opacity: 1, y: 0 }}
-            // transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="text-4xl font-bold text-center text-white mb-10"
-          >
+          <h2 className="text-4xl font-bold text-center mb-10">
             {"Projects".split("").map((char, index) => (
               <motion.span
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
                 exit={{ opacity: 0, y: -20 }}
               >
                 {char}
               </motion.span>
             ))}
-          </motion.h2>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {projectLoading ? (
               <p className="text-gray-400 text-center">Loading projects...</p>
@@ -237,43 +165,51 @@ export default function Home() {
                 initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                // viewport={{ once: true }}
                 key={project._id}
               >
-                <Card className="bg-black/50 border-none glass-effect h-full">
-                  <CardHeader>
-                    <CardTitle className="text-white text-lg">
-                      {project.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col justify-between h-full">
-                    <div>
-                      {project.image && (
-                        <Image
-                          width={500}
-                          height={300}
-                          src={project.image}
-                          alt={project.name}
-                          className="w-full h-48 object-cover mb-4 rounded-lg"
-                        />
-                      )}
-                      <p className="text-gray-100">{project.desc}</p>
-                    </div>
-                    <Button
-                      asChild
-                      variant="link"
-                      className="mt-4 text-blue-300 hover:text-blue-100"
-                    >
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                <Tilt
+                  glareEnable={true}
+                  glareMaxOpacity={0.2}
+                  scale={1.02}
+                  transitionSpeed={1000}
+                  tiltMaxAngleX={5}
+                  tiltMaxAngleY={5}
+                >
+                  <Card className="bg-black/50 border-none glass-effect h-full">
+                    <CardHeader>
+                      <CardTitle className="text-white text-lg">
+                        {project.name}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-col justify-between h-full">
+                      <div>
+                        {project.image && (
+                          <Image
+                            width={500}
+                            height={300}
+                            src={project.image}
+                            alt={project.name}
+                            className="w-full h-48 object-cover mb-4 rounded-lg"
+                          />
+                        )}
+                        <p className="text-gray-100">{project.desc}</p>
+                      </div>
+                      <Button
+                        asChild
+                        variant="link"
+                        className="mt-4 text-blue-300 hover:text-blue-100"
                       >
-                        View Project <ExternalLink className="inline-block" />
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          View Project <ExternalLink className="inline-block" />
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Tilt>
               </motion.div>
             ))}
           </div>
@@ -283,7 +219,17 @@ export default function Home() {
       {/* Skills Section */}
       <section id="skills" className="py-20 px-10 max-w-4xl mx-auto">
         <h2 className="text-4xl font-bold text-center text-white mb-10">
-          Skills
+          {"Skills".split("").map((char, index) => (
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              {char}
+            </motion.span>
+          ))}
         </h2>
         <div className="flex flex-wrap gap-2 justify-center">
           {skillLoading ? (
@@ -307,7 +253,11 @@ export default function Home() {
                 <Badge
                   key={skill._id}
                   variant="secondary"
-                  className="text-lg py-2 px-4 bg-black/50 glass-effect text-gray-100"
+                  className={`text-lg py-2 px-4 bg-black/50 glass-effect text-gray-100 cursor-default hover:scale-105 ${
+                    index % 2 == 0
+                      ? "hover:rotate-[4deg]"
+                      : "hover:rotate-[-4deg]"
+                  } transition-transform duration-200 ease-in-out`}
                 >
                   {skill.name}
                 </Badge>

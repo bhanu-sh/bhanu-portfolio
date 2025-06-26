@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 export default function TypingText() {
-  const words = ["Bhanu Pratap Sharma", "Web Developer", "App Dev"];
+  const words = React.useMemo(
+    () => ["Software", "Web", "App", "Full Stack"],
+    []
+  );
 
   const [text, setText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
@@ -29,7 +32,7 @@ export default function TypingText() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [text, isDeleting, wordIndex]);
+  }, [text, isDeleting, wordIndex, words, speed]);
 
   return (
     <span>
