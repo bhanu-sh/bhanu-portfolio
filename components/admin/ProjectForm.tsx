@@ -20,6 +20,8 @@ export default function ProjectForm() {
     desc: "",
     image: "",
     link: "",
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
   const [editing, setEditing] = useState<Project | null>(null);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
@@ -59,7 +61,14 @@ export default function ProjectForm() {
 
       const data: Project = await res.json();
       setProjects((prev) => [data, ...prev]);
-      setForm({ name: "", desc: "", image: "", link: "" });
+      setForm({
+        name: "",
+        desc: "",
+        image: "",
+        link: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
     } catch (err) {
       console.error("Failed to add project:", err);
     } finally {
