@@ -4,7 +4,7 @@ import { Project } from "@/lib/models/Project";
 
 export async function GET() {
   await connectDB();
-  const projects = await Project.find();
+  const projects = await Project.find().sort({ updatedAt: -1 });
   return NextResponse.json(projects);
 }
 
