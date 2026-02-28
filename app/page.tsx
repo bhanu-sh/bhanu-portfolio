@@ -176,7 +176,7 @@ export default function Home() {
                 </h2>
                 <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" />
                 <p className="text-xl md:text-2xl text-gray-300 font-light leading-relaxed">
-                  I'm a passionate software developer with <span className="text-white font-medium">2 years of experience</span> architecting and building modern applications.
+                  I&apos;m a passionate software developer with <span className="text-white font-medium">2 years of experience</span> architecting and building modern applications.
                 </p>
                 <p className="text-lg text-gray-400 leading-relaxed">
                   My philosophy is simple: clean code, user-centric design, and scalable architecture. I specialize in Next.js, React, and building performant interfaces that feel entirely native and premium.
@@ -354,12 +354,12 @@ export default function Home() {
             >
               <div>
                 <h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
-                  Let's Build <br/> <span className="text-blue-400">Together.</span>
+                  Let&apos;s Build <br/> <span className="text-blue-400">Together.</span>
                 </h2>
                 <p className="text-gray-400 text-lg leading-relaxed">
                   Have a great idea or need help with an existing project? 
-                  Drop me a message and I'll get back to you as soon as possible.
-                  I'm currently available for freelance work and open to new opportunities.
+                  Drop me a message and I&apos;ll get back to you as soon as possible.
+                  I&apos;m currently available for freelance work and open to new opportunities.
                 </p>
               </div>
               

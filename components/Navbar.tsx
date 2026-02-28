@@ -44,8 +44,8 @@ export default function Navbar() {
       }`}
     >
       <div
-        className={`flex items-center justify-between px-6 py-3 w-full max-w-4xl rounded-full transition-all duration-500 glass-effect bg-black/40 border border-white/10 ${
-          scrolled ? "backdrop-blur-2xl bg-black/60 shadow-[0_0_30px_rgba(99,102,241,0.15)]" : "backdrop-blur-md"
+        className={`flex items-center justify-between px-6 py-3 w-full max-w-4xl rounded-full transition-all duration-500 ios-liquid-glass ${
+          scrolled ? "shadow-[0_0_30px_rgba(99,102,241,0.15)]" : ""
         }`}
       >
         <div className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export default function Navbar() {
 
         <div className="hidden md:block">
           <Button
-            onClick={(e:any) => scrollToSection(e, "#contact")}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => scrollToSection(e as unknown as React.MouseEvent<HTMLAnchorElement>, "#contact")}
             className="rounded-full px-6 py-2 text-sm font-bold bg-white text-black hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:scale-105"
           >
             Hire Me
@@ -95,7 +95,7 @@ export default function Navbar() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-20 left-4 right-4 bg-black/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 md:hidden overflow-hidden shadow-2xl"
+            className="absolute top-20 left-4 right-4 ios-liquid-glass rounded-2xl p-4 flex flex-col gap-2 md:hidden overflow-hidden shadow-2xl z-50"
           >
             {navLinks.map((link) => (
               <a
@@ -108,7 +108,7 @@ export default function Navbar() {
               </a>
             ))}
             <Button
-              onClick={(e:any) => scrollToSection(e, "#contact")}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => scrollToSection(e as unknown as React.MouseEvent<HTMLAnchorElement>, "#contact")}
               className="mt-4 w-full rounded-xl py-6 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 transition-all shadow-lg"
             >
               Hire Me
