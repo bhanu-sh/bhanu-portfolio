@@ -20,7 +20,7 @@
     "jose": "^6.0.11",
     "lucide-react": "^0.515.0",
     "mongoose": "^8.15.2",
-    "next": "15.3.3",
+    "next": "^16.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
